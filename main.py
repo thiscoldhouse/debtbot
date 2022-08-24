@@ -25,10 +25,10 @@ class DebtBot():
         )
         self.EXCLUDED_USERS = ['AutoModerator']
         self.EXCLUDED_SUBS = []
-        self.terms = ['student loans', 'student debt']
+        self.terms = ['student loan', 'student debt', 'school debt', 'school loan']
 
         self.intros = [
-            "Have student loans? You are not a loan and you are not alone!",
+            "Have student loans? You are not alone and you are not a loan!",
         ]
         self.calls_to_action = [
             "If you owe the bank $100, the bank owns you. If you owe $1 million, you own the bank. [Debt Collective](https://debtcollective.org/) is organizing [a student debt strike](https://actionnetwork.org/forms/cant-pay-wont-pay-join-the-student-debt-strike).",
@@ -153,13 +153,13 @@ class DebtBot():
                     f'Reply failed with exception {e}'
                 )
 
-    def avoid_spam_filters(self):
-        time.sleep(120)
+    # def avoid_spam_filters(self):
+    #     time.sleep()
 
     def main(self):
         self.handle_opt_outs()
         submission_stream = self.r.subreddit(
-            'debtstrike'
+            'studentdebtbot'
         ).stream.comments()
         mentions_stream = praw.models.util.stream_generator(
             self.r.inbox.mentions
@@ -176,7 +176,7 @@ class DebtBot():
             if any([term in text for term in self.terms]):
                 if not self.already_in_thread(comment):
                     self.reply(comment)
-                    self.avoid_spam_filters()
+                    #self.avoid_spam_filters()
 
             if random.random() < .001:
                 # every 1000 comments or so, process any new opt outs
