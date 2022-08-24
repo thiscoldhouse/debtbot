@@ -65,6 +65,16 @@ class DebtBot():
         else:
             return self.already_in_thread(comment.parent())
 
+    def am_i_author(self, comment):
+        try:
+            if comment.author is not None:
+                if comment.author.name.lower() == secrets.USERNAME:
+                    return True
+            return False
+        except AttributeError as e:
+                return True
+        return False
+
     def already_replied(self, comment):
         for reply in comment.replies:
             if type(reply) is praw.models.MoreComments:
