@@ -65,6 +65,16 @@ class DebtBot():
         else:
             return self.already_in_thread(comment.parent())
 
+    def already_replied(self, comment):
+        for reply in comment.replies:
+            if type(reply) is praw.models.MoreComments:
+                for comment in rely.comments:
+                    if self.already_replied(comment):
+                        return True
+            elif self.am_i_author(reply):
+                return True
+        return False
+
     def handle_opt_outs(self):
         replies = []
         for comment in self.opt_out_submission.comments:
@@ -101,6 +111,9 @@ class DebtBot():
             comment.refresh()
         except (praw.exceptions.ClientException, AttributeError) as e:
             sys.stderr.write(f'Could not refresh comment {comment}. Exception: {e}')
+            return
+
+        if self.already_replied(comment):
             return
 
         if message is None:
