@@ -1,5 +1,6 @@
 import datetime
 import sys
+import time
 from prawcore.exceptions import Forbidden
 from praw.exceptions import RedditAPIException
 import praw
@@ -20,9 +21,9 @@ class DebtBot():
         )
         self.opt_out_submission = praw.models.Submission(
             self.r,
-            id='wwi1yn',
+            id='wwkeyx',
         )
-        self.EXCLUDED_USERS = []
+        self.EXCLUDED_USERS = ['AutoModerator']
         self.EXCLUDED_SUBS = []
         self.terms = ['student loans', 'student debt']
 
@@ -44,7 +45,7 @@ class DebtBot():
 
 ^(I'm a bot. My purpose is to help people with student debt. I'm not affilied with Debt Collective or any other organization.)
 
-[^Opt ^Out ](https://np.reddit.com/r/debtbot/comments/wwi1yn/unsubscribe_from_debtbot/)
+[^Opt ^Out ](https://np.reddit.com/r/studentdebtbot/comments/wwkeyx/unsubscribe/)
 
 """
     def already_in_thread(self, comment):
@@ -129,10 +130,14 @@ class DebtBot():
                     f'Reply failed with exception {e}'
                 )
 
+    def avoid_spam_filters(self):
+        time.sleep(120)
 
     def main(self):
         self.handle_opt_outs()
-        submission_stream = self.r.subreddit('all').stream.comments()
+        submission_stream = self.r.subreddit(
+            'debtstrike'
+        ).stream.comments()
         mentions_stream = praw.models.util.stream_generator(
             self.r.inbox.mentions
         )
@@ -148,6 +153,7 @@ class DebtBot():
             if any([term in text for term in self.terms]):
                 if not self.already_in_thread(comment):
                     self.reply(comment)
+                    self.avoid_spam_filters()
 
             if random.random() < .001:
                 # every 1000 comments or so, process any new opt outs
